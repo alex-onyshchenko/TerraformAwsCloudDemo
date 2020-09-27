@@ -34,8 +34,8 @@ resource "aws_s3_bucket" "state_bucket" {
 resource "aws_dynamodb_table" "tf_lock_state" {
   name = var.dynamo_db_table_name
 
-  # Pay per request is cheaper for low-i/o applications, like our TF lock state
-  billing_mode = "PAY_PER_REQUEST"
+  write_capacity = 5
+  read_capacity = 5
 
   # Hash key is required, and must be an attribute
   hash_key = "LockID"
