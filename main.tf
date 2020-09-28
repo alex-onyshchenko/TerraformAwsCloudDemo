@@ -8,7 +8,6 @@ terraform {
   }
 }
 
-# Download any stable version in AWS provider of 2.36.0 or higher in 2.36 train
 provider "aws" {
   region  = "us-east-1"
 }
@@ -48,5 +47,27 @@ resource "aws_route_table" "route_table2" {
   tags = {
     Name = "RouteTable2"
     Terraform = "true"
+  }
+}
+
+variable "ssh_key_private" {
+  type = string
+  default = "~/.ssh/awsdemo.pem"
+}
+
+resource "aws_instance" "web" {
+  ami           = "ami-0bcc094591f354be2"
+  instance_type = "t2.micro"
+  availability_zone = "us-east-1a"
+  key_name = "awsdemo"
+
+  provisioner "remote-exec" {
+    inline = [
+      "echo",
+    ]
+  }
+
+  provisioner "local-exec" {
+    command = "ansible-playbook -u ubuntu -i '${self.public_ip},' --private-key ${var.ssh_key_private} provision.yml"
   }
 }
